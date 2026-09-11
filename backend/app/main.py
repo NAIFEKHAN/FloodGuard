@@ -121,5 +121,107 @@ def get_experimental_hazard_index() -> dict[str, object]:
 
 
 @app.get("/api/status")
-def get_status() -> dict[str, str]:
-    return {"ml_status": "PENDING_VALIDATION", "reason": "No complete reconciled modelling-unit geometry, event CRS/datum, or non-event observation frame.", "risk_scores": "NOT_AVAILABLE"}
+def get_status() -> dict[str, object]:
+    return {
+        "ml_status": "CONDITIONAL_SPATIAL_SUSCEPTIBILITY_MODEL",
+        "model_type": "Positive-Unlabeled (PU) Spatial XGBoost",
+        "validation": "6-Fold Leave-One-Taluk-Out (LOTO) Group Cross-Validation",
+        "loto_roc_auc": 0.8747,
+        "loto_pr_auc": 0.9426,
+        "susceptibility_scores": "AVAILABLE",
+        "scenario_engine": "AVAILABLE",
+        "warning": "Demonstration spatial susceptibility ranking, not live operational flood/landslide predictions or calibrated probabilities.",
+    }
+
+
+@lru_cache(maxsize=1)
+def spatial_dataset() -> list[dict[str, str]]:
+    rows = read_csv(DATA / "processed/ml_spatial_dataset.csv")
+    if len(rows) != 40:
+        raise RuntimeError("Spatial ML dataset must contain exactly 40 unique validated villages.")
+    return rows
+
+
+@lru_cache(maxsize=1)
+def ml_model():
+    from xgboost import XGBClassifier
+    model_path = ROOT / "model/artifacts/spatial_susceptibility_xgboost.json"
+    if not model_path.exists():
+        raise RuntimeError(f"Model artifact not found at {model_path}")
+    model = XGBClassifier()
+    model.load_model(str(model_path))
+    return model
+
+
+@app.get("/api/ml-susceptibility")
+def get_ml_susceptibility() -> dict[str, object]:
+    """Return the Phase A Spatial Susceptibility model scores and evidence for 40 validated villages."""
+    rows = read_csv(DATA / "processed/ml_village_susceptibility_scores.csv")
+    if len(rows) != 40:
+        raise RuntimeError("ML village susceptibility table must contain exactly 40 validated villages.")
+    
+    pos_count = sum(1 for r in rows if r["pu_status"] == "POSITIVE")
+    unl_count = sum(1 for r in rows if r["pu_status"] == "UNLABELED")
+
+    return {
+        "classification": "SPATIAL_VILLAGE_SUSCEPTIBILITY_PU_MODEL",
+        "record_count": len(rows),
+        "labeled_positive_count": pos_count,
+        "unlabeled_count": unl_count,
+        "spatial_validation": "6-Fold Leave-One-Taluk-Out (LOTO)",
+        "metrics": {"loto_roc_auc": 0.8747, "loto_pr_auc": 0.9426, "loto_brier_score": 0.1766},
+        "warning": "Demonstration spatial susceptibility ranking; not a real-time warning, evacuation trigger, or calibrated flood probability.",
+        "records": rows,
+    }
+
+
+@app.get("/api/rainfall-scenario")
+def get_rainfall_scenario(
+    scenario: str = Query(default="baseline", description="Preset scenario (moderate, baseline, heavy, extreme, custom)"),
+    multiplier: float | None = Query(default=None, ge=0.1, le=5.0, description="Custom rainfall multiplier (0.1 to 5.0)"),
+    r1d: float | None = Query(default=None, ge=0.0, le=500.0, description="Custom 1-day rainfall override (mm)"),
+    r7d: float | None = Query(default=None, ge=0.0, le=1500.0, description="Custom 7-day rainfall override (mm)"),
+) -> dict[str, object]:
+    """Execute dynamic non-destructive rainfall scenario simulation over the 40 validated villages."""
+    from pipeline.run_rainfall_scenario import evaluate_scenario, PRESET_SCENARIOS
+    import pandas as pd
+
+    model = ml_model()
+    df_raw = pd.DataFrame(spatial_dataset())
+    
+    # Cast numeric feature columns
+    num_cols = [
+        "elevation_mean_m", "elevation_range_m", "slope_mean_deg", "slope_max_deg",
+        "rainfall_7d_p95_mm", "rainfall_3d_p95_mm", "rainfall_1d_max_mm", "rainfall_annual_mean_mm"
+    ]
+    for c in num_cols:
+        df_raw[c] = df_raw[c].astype(float)
+
+    results_df = evaluate_scenario(
+        df_raw,
+        model,
+        scenario_key=scenario,
+        multiplier=multiplier,
+        custom_rainfall_1d_mm=r1d,
+        custom_rainfall_7d_mm=r7d,
+    )
+
+    records = results_df.to_dict(orient="records")
+    tier_counts = Counter(r["scenario_tier"] for r in records)
+
+    scenario_name = PRESET_SCENARIOS.get(scenario, {}).get("name", f"Custom ({multiplier or 1.0}x)")
+    factor = multiplier if multiplier is not None else PRESET_SCENARIOS.get(scenario, {}).get("multiplier", 1.0)
+
+    return {
+        "classification": "RAINFALL_SCENARIO_DEMONSTRATION_SIMULATION",
+        "scenario_key": scenario,
+        "scenario_name": scenario_name,
+        "rainfall_factor": factor,
+        "record_count": len(records),
+        "high_tier_count": tier_counts.get("HIGH", 0),
+        "medium_tier_count": tier_counts.get("MEDIUM", 0),
+        "low_tier_count": tier_counts.get("LOW", 0),
+        "warning": "Demonstration scenario output under simulated precipitation; not a live forecast, official alert, or evacuation instruction.",
+        "records": records,
+    }
+
