@@ -2,425 +2,460 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FloodGuard | Nilgiris Disaster Intelligence & Evidence Workspace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FloodGuard | Nilgiris Geospatial Disaster Intelligence</title>
+  <meta name="description" content="Village-level spatial flood and landslide susceptibility intelligence for Nilgiris District, Tamil Nadu.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="/assets/css/dashboard.css">
 </head>
-<body class="dark-theme">
-  <!-- Top Navigation Header -->
-  <header class="topbar">
-    <div class="brand-group">
-      <a class="brand" href="#overview">
-        <div class="brand-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<body class="gmap-theme">
+  <!-- Fullscreen Map Application Workspace -->
+  <div id="map-app-container" class="map-app-container">
+    <!-- Base Leaflet Map Canvas -->
+    <div id="map" class="map-canvas" aria-label="Nilgiris Geospatial Susceptibility Map" role="region"></div>
+
+    <!-- API / Network Loading & Toast Notification System -->
+    <div id="global-toast" class="gmap-toast" style="display: none;" role="status" aria-live="polite">
+      <span class="toast-spinner" id="toast-spinner"></span>
+      <span id="toast-message" class="toast-text">Loading geospatial intelligence…</span>
+      <button id="toast-retry-btn" class="toast-retry-btn" style="display: none;" aria-label="Retry network request" type="button">Retry</button>
+    </div>
+
+    <!-- Top-Left Search, Filter & Ranking Explorer -->
+    <section class="gmap-search-container" id="search-container" aria-label="Village Search and Explorer">
+      <!-- Search Input Card -->
+      <div class="gmap-search-card">
+        <div class="gmap-search-input-wrap">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="village-search" placeholder="Search village, taluk, or LGD code…" autocomplete="off" spellcheck="false" aria-label="Search village, taluk, or LGD code">
+          <button id="btn-clear-search" class="search-clear-btn" aria-label="Clear search input" style="display: none;" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <!-- Tier Filter Pills with Synchronized Count Badges -->
+        <div class="tier-filter-pills" role="tablist" aria-label="Filter villages by susceptibility tier">
+          <button class="filter-pill active" data-tier="all" role="tab" aria-selected="true" type="button">All (<span id="kpi-villages">40</span>)</button>
+          <button class="filter-pill pill-high" data-tier="high" role="tab" aria-selected="false" type="button">High (<span id="kpi-high-tier">11</span>)</button>
+          <button class="filter-pill pill-med" data-tier="medium" role="tab" aria-selected="false" type="button">Med (<span id="kpi-med-tier">20</span>)</button>
+          <button class="filter-pill pill-low" data-tier="low" role="tab" aria-selected="false" type="button">Low (<span id="kpi-low-tier">9</span>)</button>
+        </div>
+      </div>
+
+      <!-- Live Search Results & Village Ranking Dropdown List -->
+      <div id="index-ranking" class="gmap-search-results-dropdown" role="listbox" aria-label="Village susceptibility ranking">
+        <!-- Populated dynamically by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Top-Right Status & Evidence Access Bar -->
+    <header class="gmap-top-right-bar" role="banner">
+      <div class="gmap-status-pill">
+        <div class="status-brand">
+          <svg class="brand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
+          <span class="brand-title">FloodGuard</span>
+          <span class="brand-district">Nilgiris</span>
         </div>
-        <div class="brand-text">
-          <div class="brand-name">FloodGuard <span class="badge-tag">INTELLIGENCE</span></div>
-          <div class="brand-sub">Nilgiris District · Hilly Terrain Evidence System</div>
+        <div class="status-divider"></div>
+        <div class="status-system" title="Spatial ML Model Architecture and Validation">
+          <span class="status-dot"></span>
+          <span class="status-text" id="model-status">PU XGBoost (LOTO 0.875)</span>
         </div>
-      </a>
+        <button id="btn-open-evidence" class="btn-evidence-trigger" aria-label="Open evidence vault and audit data" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Evidence & Audits</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Floating Scenario Risk Overview Card (Bottom-Right) -->
+    <section class="gmap-overview-card" id="risk-overview-card" aria-label="District Susceptibility Overview">
+      <div class="overview-header">
+        <span class="overview-title">SCENARIO RISK OVERVIEW</span>
+        <span class="overview-scope" id="overview-scenario-context">Baseline · 1.00×</span>
+      </div>
+      <div class="overview-counts-row">
+        <div class="count-item count-high" title="High Susceptibility Tier (Score ≥ 60.0)">
+          <strong id="overview-count-high" class="count-val">11</strong>
+          <span class="count-label">HIGH</span>
+        </div>
+        <div class="count-item count-med" title="Medium Susceptibility Tier (Score 30.0–59.9)">
+          <strong id="overview-count-med" class="count-val">20</strong>
+          <span class="count-label">MEDIUM</span>
+        </div>
+        <div class="count-item count-low" title="Low Susceptibility Tier (Score < 30.0)">
+          <strong id="overview-count-low" class="count-val">9</strong>
+          <span class="count-label">LOW</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Map Risk Legend (Above Overview Card) -->
+    <div class="gmap-legend-card" id="map-legend-card" aria-label="Susceptibility Tiers Legend">
+      <div class="legend-header">SUSCEPTIBILITY TIERS</div>
+      <div class="legend-items-list">
+        <div class="legend-item">
+          <span class="legend-dot dot-high"></span>
+          <span class="legend-label">High (≥ 60.0)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot dot-medium"></span>
+          <span class="legend-label">Medium (30.0–59.9)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot dot-low"></span>
+          <span class="legend-label">Low (&lt; 30.0)</span>
+        </div>
+        <div class="legend-divider"></div>
+        <div class="legend-item">
+          <span class="legend-dot dot-coral"></span>
+          <span class="legend-label">GSI Landslide Point (772)</span>
+        </div>
+      </div>
     </div>
 
-    <div class="topbar-center">
-      <div class="status-indicator">
-        <span class="status-pulse"></span>
-        <span class="status-label">Evidence Workspace</span>
+    <!-- Floating Map Action Controls (Right Center) -->
+    <nav class="gmap-map-controls" role="toolbar" aria-label="Map Interaction Toolbar">
+      <div class="control-group">
+        <button id="btn-zoom-in" class="gmap-control-btn" title="Zoom In" aria-label="Zoom In" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="btn-zoom-out" class="gmap-control-btn" title="Zoom Out" aria-label="Zoom Out" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
       </div>
-      <div class="district-badge">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Nilgiris (TN), India</span>
-      </div>
-    </div>
 
-    <div class="topbar-actions">
-      <div class="ml-status-pill" id="ml-status-pill" title="Machine Learning Status">
-        <span class="ml-status-dot"></span>
-        <span class="ml-status-text">ML: <strong id="model-status">PU XGBoost (LOTO 0.875)</strong></span>
+      <div class="control-group">
+        <button id="btn-reset-map" class="gmap-control-btn" title="Center Nilgiris District" aria-label="Center Nilgiris District" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        </button>
+        <button id="btn-toggle-layers" class="gmap-control-btn" title="Layer Visibility Toggles" aria-label="Layer Visibility Toggles" aria-expanded="false" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </button>
+        <button id="btn-fullscreen" class="gmap-control-btn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
       </div>
-      <a href="#methodology" class="btn btn-outline-sm">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        Methodology
-      </a>
-    </div>
-  </header>
 
-  <!-- Global Disclaimer Ribbon -->
-  <div class="disclaimer-banner">
-    <div class="disclaimer-content">
-      <span class="disclaimer-badge">SPATIAL PU-ML AUDIT</span>
-      <span class="disclaimer-title">SPATIAL SUSCEPTIBILITY & SCENARIO ENGINE:</span>
-      <span class="disclaimer-text">Positive-Unlabeled XGBoost with Leave-One-Taluk-Out validation (LOTO ROC-AUC 0.8747) for 40 validated villages. <strong>DEMONSTRATION SIMULATION · NOT LIVE PREDICTIONS · NOT OFFICIAL WARNINGS.</strong></span>
-    </div>
-    <div class="disclaimer-meta">
-      <span id="model-reason">PU-ML active · 25 Positive · 15 Unlabeled</span>
-    </div>
-  </div>
-
-  <div class="dashboard-container">
-    <!-- Quick Nav Bar -->
-    <nav class="subnav">
-      <div class="nav-links">
-        <a href="#overview" class="nav-link active">Situation Overview</a>
-        <a href="#map-section" class="nav-link">Spatial Map</a>
-        <a href="#village-intelligence" class="nav-link">Village Susceptibility</a>
-        <a href="#evidence-section" class="nav-link">Evidence Explorer</a>
-        <a href="#methodology" class="nav-link">Audits & Governance</a>
-      </div>
-      <div class="nav-right">
-        <span class="audit-counter">40 Polygons Validated · 772 Landslide Points · LOTO CV Validated</span>
+      <!-- Layers Popup Panel -->
+      <div id="layers-popup" class="gmap-layers-popup" style="display: none;" role="menu" aria-label="Map Layer Selection">
+        <div class="layers-popup-title">Map Layers</div>
+        <label class="custom-toggle">
+          <input type="checkbox" id="toggle-susceptibility" checked>
+          <span class="toggle-indicator"></span>
+          <span class="toggle-text">Susceptibility Zones (40)</span>
+        </label>
+        <label class="custom-toggle">
+          <input type="checkbox" id="toggle-events" checked>
+          <span class="toggle-indicator"></span>
+          <span class="toggle-text">GSI Landslides (772)</span>
+        </label>
+        <label class="custom-toggle">
+          <input type="checkbox" id="toggle-boundaries" checked>
+          <span class="toggle-indicator"></span>
+          <span class="toggle-text">Administrative Boundaries</span>
+        </label>
+        <label class="custom-toggle">
+          <input type="checkbox" id="toggle-centroids" checked>
+          <span class="toggle-indicator"></span>
+          <span class="toggle-text">Village Markers</span>
+        </label>
       </div>
     </nav>
 
-    <main class="main-content">
-      <!-- KPI Metric Cards Grid -->
-      <section id="overview" class="kpi-section" aria-label="Key Evidence Metrics">
-        <div class="kpi-card" id="kpi-card-villages">
-          <div class="kpi-icon kpi-teal">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-title">Validated Villages</span>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-villages">40</span>
-              <span class="kpi-badge">25 Pos / 15 Unl</span>
-            </div>
-            <span class="kpi-caption">Exact LGD polygons (SRTM + IMD fused)</span>
+    <!-- Floating Scenario Simulator Control (Bottom-Left) -->
+    <section class="gmap-scenario-card" id="scenario-panel" aria-label="Precipitation Scenario Simulator">
+      <div class="scenario-card-header">
+        <div class="scenario-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>
+          <span class="scenario-title">RAINFALL SCENARIO</span>
+        </div>
+        <span class="badge-tag tag-cyan" id="scenario-status-badge">1.00x Baseline</span>
+      </div>
+
+      <!-- Preset Buttons Row -->
+      <div class="scenario-presets-row" role="group" aria-label="Precipitation Scenario Presets">
+        <button class="preset-btn" data-scenario="moderate" title="Moderate Precipitation (0.70x baseline)" type="button">0.70× Moderate</button>
+        <button class="preset-btn active" data-scenario="baseline" title="Historical Baseline (1.00x)" type="button">1.00× Baseline</button>
+        <button class="preset-btn" data-scenario="heavy" title="Heavy Monsoon (1.50x baseline)" type="button">1.50× Heavy</button>
+        <button class="preset-btn" data-scenario="extreme" title="Extreme Torrential (2.20x baseline)" type="button">2.20× Extreme</button>
+      </div>
+
+      <!-- Custom Multiplier Slider -->
+      <div class="scenario-slider-box">
+        <div class="slider-label-row">
+          <span class="slider-label">Precipitation Multiplier</span>
+          <output id="scenario-value" class="slider-output">1.00x Multiplier (Baseline)</output>
+        </div>
+        <div class="slider-input-row">
+          <input id="scenario-slider" type="range" min="0.5" max="3.0" step="0.1" value="1.0" aria-label="Simulated precipitation multiplier">
+          <button class="btn-reset-scenario" id="btn-reset-scenario" title="Reset scenario to 1.00x baseline" type="button">Reset</button>
+        </div>
+      </div>
+
+      <!-- Non-Destructive Simulation Disclaimer -->
+      <div class="scenario-disclaimer-text">
+        <span class="sim-badge">SIMULATION</span>
+        <span>Simulation — not live operational warning. In-memory PU-ML feature perturbation. Raw NetCDFs and SRTM remain immutable.</span>
+      </div>
+    </section>
+
+    <!-- Floating Village Detail Panel / Bottom Sheet (Desktop Right / Mobile Bottom) -->
+    <aside class="gmap-village-detail-panel" id="village-detail-panel" aria-label="Selected Village Detailed Intelligence" style="display: none;">
+      <!-- Mobile Drag Handle -->
+      <div class="mobile-sheet-handle" aria-hidden="true"></div>
+
+      <div class="detail-top-bar">
+        <div class="detail-header-left">
+          <span class="badge-label" id="detail-pu-label">HISTORICAL POSITIVE EVIDENCE</span>
+          <h2 id="detail-village-name" class="detail-village-title">Select Village</h2>
+          <div class="detail-meta-sub">
+            <span id="detail-village-taluk">Taluk: —</span> · <span id="detail-village-lgd" class="mono">LGD: —</span>
           </div>
         </div>
-
-        <div class="kpi-card" id="kpi-card-high">
-          <div class="kpi-icon kpi-coral">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-title">High Susceptibility</span>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-high-tier">11</span>
-              <span class="kpi-badge tier-chip tier-high">Score ≥ 60.0</span>
-            </div>
-            <span class="kpi-caption" id="kpi-high-caption">Under active rainfall scenario</span>
+        <div class="detail-header-right">
+          <button id="btn-close-detail" class="detail-close-btn" aria-label="Close village detail panel" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <div class="detail-badge-group">
+            <span id="detail-tier-badge" class="tier-chip tier-high">HIGH</span>
+            <span id="detail-delta-badge" class="delta-chip delta-zero">Δ 0.0 pts</span>
           </div>
         </div>
+      </div>
 
-        <div class="kpi-card" id="kpi-card-med">
-          <div class="kpi-icon kpi-amber">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-title">Medium Susceptibility</span>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-med-tier">20</span>
-              <span class="kpi-badge tier-chip tier-medium">Score 30–59.9</span>
-            </div>
-            <span class="kpi-caption" id="kpi-med-caption">Under active rainfall scenario</span>
-          </div>
+      <!-- Hero Score Box -->
+      <div class="hero-score-box">
+        <div class="score-meta-row">
+          <span class="score-label">Susceptibility Score</span>
+          <span class="score-scale">0–100 Relative Index</span>
         </div>
-
-        <div class="kpi-card" id="kpi-card-low">
-          <div class="kpi-icon kpi-blue">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-title">Low Susceptibility</span>
-            <div class="kpi-value-row">
-              <span class="kpi-value" id="kpi-low-tier">9</span>
-              <span class="kpi-badge tier-chip tier-low">Score &lt; 30.0</span>
-            </div>
-            <span class="kpi-caption" id="kpi-low-caption">Under active rainfall scenario</span>
-          </div>
+        <div class="score-number-row">
+          <span id="detail-index" class="score-number">—</span>
+          <span class="score-denom">/ 100</span>
         </div>
-      </section>
-
-      <!-- Primary Spatial & Intelligence Section -->
-      <section id="map-section" class="primary-layout">
-        <!-- Main Map Area (Dominant Focus) -->
-        <div class="map-container-card">
-          <div class="card-header">
-            <div class="header-titles">
-              <div class="badge-label">SPATIAL SITUATION VIEW</div>
-              <h2 class="card-title">Nilgiris Susceptibility & Evidence Map</h2>
-            </div>
-            <div class="map-controls-header">
-              <button class="btn btn-sm btn-ghost" id="btn-reset-map" title="Reset view to Nilgiris">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                Center District
-              </button>
-              <span class="badge-tag tag-cyan">OSM BASEMAP · NO API KEYS</span>
-            </div>
+        <div class="score-bar-track" aria-hidden="true">
+          <div id="detail-score-bar" class="score-bar-fill" style="width: 0%;"></div>
+        </div>
+        
+        <!-- Scenario Impact Breakdown -->
+        <div class="scenario-impact-box">
+          <div class="impact-header">
+            <span class="impact-title">SCENARIO IMPACT</span>
+            <span class="impact-note" id="detail-delta-note">vs Historical Baseline</span>
           </div>
-
-          <!-- Leaflet Map Container -->
-          <div class="map-wrapper">
-            <div id="map"></div>
-            
-            <!-- Floating Map Legend -->
-            <div class="map-floating-legend">
-              <div class="legend-header">Map Legend</div>
-              <div class="legend-row">
-                <span class="legend-dot dot-coral"></span>
-                <span>GSI Landslide Event (772)</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-poly poly-boundary"></span>
-                <span>Village Boundary (KMZ)</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-chip chip-high"></span>
-                <span>High Susceptibility (≥ 60)</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-chip chip-medium"></span>
-                <span>Medium Susceptibility (30–59)</span>
-              </div>
-              <div class="legend-row">
-                <span class="legend-chip chip-low"></span>
-                <span>Low Susceptibility (&lt; 30)</span>
-              </div>
+          <div class="score-baseline-comparison">
+            <div class="comp-col">
+              <span class="comp-sub-label">Baseline Score</span>
+              <strong id="detail-base-score" class="comp-sub-val">—</strong>
             </div>
-          </div>
-
-          <!-- Map Footer with Layer Toggles & Telemetry -->
-          <div class="map-footer-bar">
-            <div class="layer-switch-group">
-              <span class="layer-switch-title">Layers:</span>
-              <label class="custom-toggle">
-                <input type="checkbox" id="toggle-events" checked>
-                <span class="toggle-indicator"></span>
-                <span class="toggle-text">GSI Landslides (772)</span>
-              </label>
-              <label class="custom-toggle">
-                <input type="checkbox" id="toggle-boundaries" checked>
-                <span class="toggle-indicator"></span>
-                <span class="toggle-text">Village Polygons (KMZ)</span>
-              </label>
-              <label class="custom-toggle">
-                <input type="checkbox" id="toggle-centroids" checked>
-                <span class="toggle-indicator"></span>
-                <span class="toggle-text">Susceptibility Tiers</span>
-              </label>
+            <div class="comp-col-arrow">→</div>
+            <div class="comp-col">
+              <span class="comp-sub-label">Scenario Score</span>
+              <strong id="detail-scenario-score" class="comp-sub-val">—</strong>
             </div>
-            <div class="map-status-text" id="map-status">
-              Loading spatial boundaries and landslide markers…
-            </div>
-          </div>
-
-          <!-- Scenario Simulation Sandbox -->
-          <div class="scenario-panel">
-            <div class="scenario-panel-header">
-              <div class="scenario-title-group">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>
-                <div>
-                  <strong>Rainfall Scenario Simulator</strong>
-                  <span class="scenario-subtitle">Dynamic in-memory inference across 40 validated villages (PU XGBoost)</span>
-                </div>
-              </div>
-              <span class="badge-tag tag-cyan" id="scenario-status-badge">ACTIVE: BASELINE (1.00x)</span>
-            </div>
-
-            <div class="scenario-body">
-              <div class="scenario-controls">
-                <div class="scenario-presets">
-                  <span class="preset-label">Scenario Presets:</span>
-                  <button class="preset-btn" data-scenario="moderate" title="Moderate / Normal (0.70x baseline)">Moderate (0.7x)</button>
-                  <button class="preset-btn active" data-scenario="baseline" title="Historical Baseline (1.00x)">Baseline (1.0x)</button>
-                  <button class="preset-btn" data-scenario="heavy" title="Heavy Monsoon (1.50x baseline)">Heavy (1.5x)</button>
-                  <button class="preset-btn" data-scenario="extreme" title="Extreme Torrential (2.20x baseline)">Extreme (2.2x)</button>
-                </div>
-                <div class="control-item">
-                  <label for="scenario-slider">
-                    <span>Rainfall Multiplier Factor</span>
-                    <output id="scenario-value">1.00x Multiplier (Baseline)</output>
-                  </label>
-                  <div class="slider-row">
-                    <input id="scenario-slider" type="range" min="0.5" max="3.0" step="0.1" value="1.0" aria-label="Rainfall multiplier">
-                    <button class="btn btn-sm btn-ghost" id="btn-reset-scenario" title="Reset scenario to baseline">Reset</button>
-                  </div>
-                </div>
-              </div>
-              <div class="scenario-guardrail-note">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>Demonstration scenario simulation only. Terrain constants remain fixed; rainfall features scaled in-memory. Not a live operational flood warning.</span>
-              </div>
+            <div class="comp-col comp-col-delta">
+              <span class="comp-sub-label">Score Change</span>
+              <strong id="detail-delta-val" class="comp-sub-val delta-val">—</strong>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Right Side: Village Intelligence & Detailed Breakdown Drawer -->
-        <aside id="village-intelligence" class="intelligence-drawer">
-          <!-- Village Ranking List Card -->
-          <div class="ranking-panel">
-            <div class="panel-top">
-              <div class="panel-header-row">
-                <div>
-                  <div class="badge-label">40 VALIDATED VILLAGES</div>
-                  <h3 class="panel-heading">Susceptibility Ranking</h3>
-                </div>
-                <span class="badge-tag tag-purple">PU XGBOOST 0–100</span>
-              </div>
+      <!-- Feature Component Evidence Cards -->
+      <div class="components-grid" id="experimental-detail">
+        <div class="component-card">
+          <span class="comp-label">Terrain Slope</span>
+          <strong class="comp-val" id="comp-terrain">—</strong>
+          <span class="comp-sub" id="comp-terrain-raw">Mean & Max Slope</span>
+        </div>
+        <div class="component-card">
+          <span class="comp-label">Scenario 7D Rain</span>
+          <strong class="comp-val" id="comp-rain">—</strong>
+          <span class="comp-sub" id="comp-rain-raw">P95 mm (Simulated)</span>
+        </div>
+        <div class="component-card">
+          <span class="comp-label">Historical Events</span>
+          <strong class="comp-val" id="comp-events">—</strong>
+          <span class="comp-sub" id="comp-events-raw">GSI Strict Containment</span>
+        </div>
+        <div class="component-card">
+          <span class="comp-label">1D Peak Rain</span>
+          <strong class="comp-val" id="comp-rain-1d">—</strong>
+          <span class="comp-sub" id="comp-rain-1d-raw">Max mm (Simulated)</span>
+        </div>
+      </div>
 
-              <!-- Search and Filter Controls -->
-              <div class="search-filter-box">
-                <div class="search-input-wrap">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <input type="text" id="village-search" placeholder="Search village or taluk…" aria-label="Search village">
-                </div>
-                <div class="tier-filter-pills">
-                  <button class="filter-pill active" data-tier="all">All (40)</button>
-                  <button class="filter-pill pill-high" data-tier="high">High</button>
-                  <button class="filter-pill pill-med" data-tier="medium">Med</button>
-                  <button class="filter-pill pill-low" data-tier="low">Low</button>
-                </div>
-              </div>
-            </div>
+      <!-- GSI Evidence Quick Action -->
+      <div class="gsi-evidence-action-card">
+        <div class="gsi-action-info">
+          <span class="gsi-action-title">GSI / NLFC Evidence</span>
+          <span class="gsi-action-desc" id="detail-gsi-desc">Historical landslide inventory record</span>
+        </div>
+        <button id="btn-view-village-evidence" class="btn-view-evidence" type="button">View Evidence</button>
+      </div>
 
-            <!-- Scrollable Village Ranking List -->
-            <div id="index-ranking" class="village-list-scroll" role="listbox" aria-label="Ranked list of validated Nilgiris villages">
-              <!-- Dynamically populated by JS -->
-            </div>
+      <!-- Provenance & Governance Checklist -->
+      <div class="provenance-section">
+        <h4 class="provenance-title">Model Governance & Provenance Checklist</h4>
+        <dl class="provenance-list" id="experimental-provenance">
+          <div class="prov-row"><dt>Model Type</dt><dd>Positive-Unlabeled (PU) Spatial XGBoost</dd></div>
+          <div class="prov-row"><dt>Validation</dt><dd>6-Fold Leave-One-Taluk-Out (LOTO ROC-AUC 0.8747)</dd></div>
+          <div class="prov-row"><dt>Universe</dt><dd>40 Validated Villages (25 Pos / 15 Unlabeled)</dd></div>
+          <div class="prov-row"><dt>Rainfall Mode</dt><dd id="prov-rainfall-mode">In-Memory Multiplier</dd></div>
+        </dl>
+        <p class="governance-disclaimer" id="experimental-reading">
+          FloodGuard is a demonstration spatial susceptibility and rainfall-scenario system. Outputs are not official disaster warnings, evacuation triggers, or real-time forecasts. UNLABELED villages indicate absence of recorded inventory evidence, not confirmed safety.
+        </p>
+      </div>
+    </aside>
+
+    <!-- Traceable Evidence & Methodology Modal Dialog (6 Tabs) -->
+    <div id="evidence-modal" class="gmap-evidence-modal" style="display: none;" role="dialog" aria-modal="true" aria-label="Evidence & Methodology Vault">
+      <div class="modal-backdrop" id="modal-backdrop"></div>
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div class="modal-header-titles">
+            <span class="badge-label">TRACEABLE DATA VAULT & AUDITS</span>
+            <h2 class="modal-title">Evidence Explorer & Scientific Governance</h2>
           </div>
-
-          <!-- Selected Village Deep Dive Card -->
-          <div class="village-detail-card" id="village-detail-panel">
-            <div class="detail-header">
-              <div>
-                <div class="badge-label" id="detail-pu-label">PU POSITIVE EVIDENCE</div>
-                <h3 id="detail-village-name" class="detail-title">Select a village</h3>
-                <div class="detail-subtitle">
-                  <span id="detail-village-taluk">Taluk: —</span> · <span id="detail-village-lgd" class="mono">LGD: —</span>
-                </div>
-              </div>
-              <div class="detail-badge-group">
-                <span id="detail-tier-badge" class="tier-chip tier-chip-empty">—</span>
-                <span id="detail-delta-badge" class="delta-chip delta-zero">Δ 0.0</span>
-              </div>
-            </div>
-
-            <!-- Hero Score Box -->
-            <div class="hero-score-box">
-              <div class="score-meta">
-                <span class="score-label">Scenario Susceptibility Score</span>
-                <span class="score-scale">0–100 Relative Index</span>
-              </div>
-              <div class="score-display">
-                <span id="detail-index" class="score-number">—</span>
-                <span class="score-max">/100</span>
-              </div>
-              <div class="score-bar-bg">
-                <div id="detail-score-bar" class="score-bar-fill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <!-- 4 Component Breakdown Cards -->
-            <div class="components-grid" id="experimental-detail">
-              <div class="component-card">
-                <span class="comp-label">Terrain Slope</span>
-                <strong class="comp-val" id="comp-terrain">—</strong>
-                <span class="comp-sub" id="comp-terrain-raw">Mean & Max Slope</span>
-              </div>
-              <div class="component-card">
-                <span class="comp-label">Scenario 7D Rain</span>
-                <strong class="comp-val" id="comp-rain">—</strong>
-                <span class="comp-sub" id="comp-rain-raw">P95 mm (Simulated)</span>
-              </div>
-              <div class="component-card">
-                <span class="comp-label">Historical Events</span>
-                <strong class="comp-val" id="comp-events">—</strong>
-                <span class="comp-sub" id="comp-events-raw">GSI Strict Containment</span>
-              </div>
-              <div class="component-card">
-                <span class="comp-label">1D Peak Rain</span>
-                <strong class="comp-val" id="comp-rain-1d">—</strong>
-                <span class="comp-sub" id="comp-rain-1d-raw">Max mm (Simulated)</span>
-              </div>
-            </div>
-
-            <!-- Provenance and Verification Trail -->
-            <div class="provenance-section">
-              <h4 class="provenance-title">Model Governance & Provenance Checklist</h4>
-              <dl class="provenance-list" id="experimental-provenance">
-                <div class="prov-row"><dt>Model Type</dt><dd>Positive-Unlabeled (PU) Spatial XGBoost</dd></div>
-                <div class="prov-row"><dt>Validation</dt><dd>6-Fold Leave-One-Taluk-Out (LOTO ROC-AUC 0.8747)</dd></div>
-                <div class="prov-row"><dt>Universe</dt><dd>40 Validated Villages (25 Positive, 15 Unlabeled)</dd></div>
-                <div class="prov-row"><dt>Rainfall Mode</dt><dd id="prov-rainfall-mode">In-Memory Multiplier (1.00x Baseline)</dd></div>
-              </dl>
-              <p class="governance-disclaimer" id="experimental-reading">
-                Demonstration spatial susceptibility output under simulated rainfall scenario.
-              </p>
-            </div>
-          </div>
-        </aside>
-      </section>
-
-      <!-- Multi-Source Evidence Inspection Explorer -->
-      <section id="evidence-section" class="evidence-explorer-card">
-        <div class="card-header">
-          <div class="header-titles">
-            <div class="badge-label">TRACEABLE DATA VAULT</div>
-            <h2 class="card-title">Multi-Source Evidence Explorer</h2>
-          </div>
-          <!-- Evidence Tabs -->
-          <div class="evidence-tabs">
-            <button class="tab-btn active" data-target="tab-rainfall">IMD Rainfall Series</button>
-            <button class="tab-btn" data-target="tab-events">GSI Landslide Inventory</button>
-            <button class="tab-btn" data-target="tab-ddmp">DDMP Plan Evidence</button>
-            <button class="tab-btn" data-target="tab-admin">Administrative Framework</button>
-          </div>
+          <button id="btn-close-evidence" class="modal-close-btn" aria-label="Close evidence vault" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
 
-        <div class="tab-contents">
-          <!-- Tab 1: Rainfall -->
-          <div class="tab-pane active" id="tab-rainfall">
+        <!-- 6 Distinct Auditable Tabs -->
+        <div class="modal-tabs" role="tablist">
+          <button class="tab-btn active" data-target="tab-target" role="tab" aria-selected="true" type="button">Target Resolution</button>
+          <button class="tab-btn" data-target="tab-spatial" role="tab" aria-selected="false" type="button">Spatial Model</button>
+          <button class="tab-btn" data-target="tab-events" role="tab" aria-selected="false" type="button">GSI Inventory</button>
+          <button class="tab-btn" data-target="tab-rainfall" role="tab" aria-selected="false" type="button">IMD Rainfall</button>
+          <button class="tab-btn" data-target="tab-admin" role="tab" aria-selected="false" type="button">Administrative Boundary</button>
+          <button class="tab-btn" data-target="tab-methodology" role="tab" aria-selected="false" type="button">Scientific Governance</button>
+        </div>
+
+        <div class="modal-body-scroll">
+          <!-- Tab 1: Target Resolution -->
+          <div class="tab-pane active" id="tab-target" role="tabpanel">
             <div class="pane-grid">
               <div class="pane-side">
-                <div class="control-stack">
-                  <label class="control-label" for="rain-year">Select IMD Archive Year</label>
-                  <select id="rain-year" class="form-select">
-                    <option>2017</option>
-                    <option>2019</option>
-                    <option>2022</option>
-                    <option>2023</option>
-                    <option selected>2024</option>
-                  </select>
+                <div class="event-summary-box">
+                  <span class="badge-label">PU TARGET FORMULATION</span>
+                  <div class="summary-metric">
+                    <strong>40</strong>
+                    <span>Validated Village Universe</span>
+                  </div>
                 </div>
-                <div class="control-stack">
-                  <label class="control-label" for="rain-place">Settlement Coordinate</label>
-                  <select id="rain-place" class="form-select"></select>
+                <div class="category-breakdown">
+                  <span class="control-label">Universe Partition</span>
+                  <dl class="stat-dl">
+                    <div><dt>Historical Positive</dt><dd>25 Villages (62.5%)</dd></div>
+                    <div><dt>Unlabeled</dt><dd>15 Villages (37.5%)</dd></div>
+                    <div><dt>Negative Assumptions</dt><dd>0 (Strict Zero-Imputation)</dd></div>
+                  </dl>
                 </div>
-                <div class="info-callout">
-                  <span class="callout-title">IMD Gridded Data</span>
-                  <p id="rain-reading">Loading rainfall feature data…</p>
-                  <small class="text-muted">Zero imputation. Rolling nulls strictly retained.</small>
-                </div>
+                <p class="text-muted text-xs">Unlabeled villages lack confirmed GSI inventory records but are never treated as negative evidence.</p>
               </div>
               <div class="pane-main">
-                <div class="table-container">
+                <h4 class="section-subheading">Positive-Unlabeled Target Formulation (Phase A1 Gate)</h4>
+                <p class="text-secondary text-sm">
+                  Because non-event dates in historical records cannot be proven to be true negative disaster absences (due to uninstrumented reporting), supervised binary classification would create synthetic bias. FloodGuard formulates spatial susceptibility under the defensible <strong>Positive-Unlabeled (PU) ML paradigm</strong>, learning relative susceptibility from validated positive inventory points without fabricating negative labels.
+                </p>
+                <div class="table-container compact-scroll" style="margin-top: 12px;">
                   <table class="data-table">
                     <thead>
                       <tr>
-                        <th>Observation Date</th>
-                        <th>1-Day Rainfall (mm)</th>
-                        <th>3-Day Rolling (mm)</th>
-                        <th>7-Day Rolling (mm)</th>
+                        <th>Metric / Parameter</th>
+                        <th>Value</th>
+                        <th>Governance Rule</th>
                       </tr>
                     </thead>
-                    <tbody id="rain-table">
-                      <tr><td colspan="4" class="text-center">Loading daily rainfall records…</td></tr>
+                    <tbody>
+                      <tr>
+                        <td>Validated Polygon Universe</td>
+                        <td class="mono">40 Villages</td>
+                        <td>Exact containment against SOI KMZ boundaries</td>
+                      </tr>
+                      <tr>
+                        <td>Positive Label Count</td>
+                        <td class="mono">25 Villages</td>
+                        <td>At least 1 verified GSI landslide event</td>
+                      </tr>
+                      <tr>
+                        <td>Unlabeled Count</td>
+                        <td class="mono">15 Villages</td>
+                        <td>Zero recorded GSI events (UNLABELED ≠ NO RISK)</td>
+                      </tr>
+                      <tr>
+                        <td>Cross-Validation Scheme</td>
+                        <td class="mono">6-Fold LOTO</td>
+                        <td>Leave-One-Taluk-Out spatial group splitting</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
-                <p id="rain-status" class="table-caption">Showing latest records for selected location.</p>
               </div>
             </div>
           </div>
 
-          <!-- Tab 2: Landslide Events -->
-          <div class="tab-pane" id="tab-events">
+          <!-- Tab 2: Spatial Model & Validation -->
+          <div class="tab-pane" id="tab-spatial" role="tabpanel">
+            <div class="pane-grid">
+              <div class="pane-side">
+                <div class="event-summary-box">
+                  <span class="badge-label">MODEL ARCHITECTURE</span>
+                  <div class="summary-metric">
+                    <strong>XGBoost</strong>
+                    <span>PU Spatial Classifier</span>
+                  </div>
+                </div>
+                <div class="category-breakdown">
+                  <span class="control-label">Validation Metrics</span>
+                  <dl class="stat-dl">
+                    <div><dt>LOTO ROC-AUC</dt><dd class="mono">0.8747</dd></div>
+                    <div><dt>PR-AUC</dt><dd class="mono">0.9426</dd></div>
+                    <div><dt>Brier Score</dt><dd class="mono">0.1766</dd></div>
+                  </dl>
+                </div>
+              </div>
+              <div class="pane-main">
+                <h4 class="section-subheading">Leave-One-Taluk-Out (LOTO) Spatial Group Validation</h4>
+                <p class="text-secondary text-sm">
+                  Standard random k-fold splits suffer from extreme spatial auto-correlation and spatial leakage. FloodGuard evaluates generalization strictly by holding out entire taluks during training (6-fold LOTO across Udhagai, Coonoor, Kotagiri, Gudalur, Pandalur, and Kundah).
+                </p>
+                <div class="table-container compact-scroll" style="margin-top: 12px;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Taluk Fold (Held Out)</th>
+                        <th>Villages in Fold</th>
+                        <th>Positive Cases</th>
+                        <th>Fold Evaluation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Udhagai</td><td class="mono">12</td><td class="mono">8</td><td>Spatial generalization verified</td></tr>
+                      <tr><td>Coonoor</td><td class="mono">8</td><td class="mono">6</td><td>Spatial generalization verified</td></tr>
+                      <tr><td>Kotagiri</td><td class="mono">7</td><td class="mono">4</td><td>Spatial generalization verified</td></tr>
+                      <tr><td>Gudalur</td><td class="mono">5</td><td class="mono">3</td><td>Spatial generalization verified</td></tr>
+                      <tr><td>Pandalur</td><td class="mono">4</td><td class="mono">2</td><td>Spatial generalization verified</td></tr>
+                      <tr><td>Kundah</td><td class="mono">4</td><td class="mono">2</td><td>Spatial generalization verified</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: GSI Inventory -->
+          <div class="tab-pane" id="tab-events" role="tabpanel">
             <div class="pane-grid">
               <div class="pane-side">
                 <div class="event-summary-box">
@@ -457,33 +492,53 @@
             </div>
           </div>
 
-          <!-- Tab 3: DDMP Documentary Evidence -->
-          <div class="tab-pane" id="tab-ddmp">
-            <div class="ddmp-grid">
-              <div id="ddmp-cards" class="ddmp-metrics-row"></div>
-              <div class="table-container">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Taluk</th>
-                      <th>Very High Vulnerable</th>
-                      <th>High Vulnerable</th>
-                      <th>Medium Vulnerable</th>
-                      <th>Low Vulnerable</th>
-                      <th>Total Locations</th>
-                    </tr>
-                  </thead>
-                  <tbody id="ddmp-table">
-                    <tr><td colspan="6" class="text-center">Loading DDMP disaster vulnerability table…</td></tr>
-                  </tbody>
-                </table>
+          <!-- Tab 4: IMD Rainfall Series -->
+          <div class="tab-pane" id="tab-rainfall" role="tabpanel">
+            <div class="pane-grid">
+              <div class="pane-side">
+                <div class="control-stack">
+                  <label class="control-label" for="rain-year">Select IMD Archive Year</label>
+                  <select id="rain-year" class="form-select">
+                    <option>2017</option>
+                    <option>2019</option>
+                    <option>2022</option>
+                    <option>2023</option>
+                    <option selected>2024</option>
+                  </select>
+                </div>
+                <div class="control-stack">
+                  <label class="control-label" for="rain-place">Settlement Coordinate</label>
+                  <select id="rain-place" class="form-select"></select>
+                </div>
+                <div class="info-callout">
+                  <span class="callout-title">IMD Gridded NetCDF</span>
+                  <p id="rain-reading">Loading rainfall feature data…</p>
+                  <small class="text-muted">Zero imputation. Rolling nulls strictly retained.</small>
+                </div>
               </div>
-              <p class="table-caption">Source: Nilgiris District Disaster Management Plan (DDMP). Documentary evidence only.</p>
+              <div class="pane-main">
+                <div class="table-container">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Observation Date</th>
+                        <th>1-Day Rainfall (mm)</th>
+                        <th>3-Day Rolling (mm)</th>
+                        <th>7-Day Rolling (mm)</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rain-table">
+                      <tr><td colspan="4" class="text-center">Loading daily rainfall records…</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p id="rain-status" class="table-caption">Showing latest records for selected location.</p>
+              </div>
             </div>
           </div>
 
-          <!-- Tab 4: Admin & Terrain Baseline -->
-          <div class="tab-pane" id="tab-admin">
+          <!-- Tab 5: Administrative Boundary & Terrain -->
+          <div class="tab-pane" id="tab-admin" role="tabpanel">
             <div class="pane-grid">
               <div class="admin-column">
                 <h4 class="section-subheading">Administrative Framework (Village Master)</h4>
@@ -509,66 +564,49 @@
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Compact Methodology & Data Guardrails Card -->
-      <section id="methodology" class="methodology-card">
-        <div class="methodology-header">
-          <div>
-            <div class="badge-label">SCIENTIFIC INTEGRITY & ETHICAL GOVERNANCE</div>
-            <h3 class="card-title">Governance Principles & Methodological Guardrails</h3>
-          </div>
-          <span class="badge-tag tag-green">STRICT ADHERENCE</span>
-        </div>
-        <div class="guardrails-grid">
-          <div class="guardrail-item">
-            <div class="guardrail-num">01</div>
-            <div class="guardrail-body">
-              <strong>Zero Data Fabrication</strong>
-              <p>All inputs originate from authentic portals (IMD, GSI, SOI, DDMP). Unlabeled locations are strictly preserved without synthetic negative labels or imputation.</p>
+          <!-- Tab 6: Scientific Governance & Limitations -->
+          <div class="tab-pane" id="tab-methodology" role="tabpanel">
+            <div class="guardrails-grid">
+              <div class="guardrail-item">
+                <div class="guardrail-num">01</div>
+                <div class="guardrail-body">
+                  <strong>Zero Data Fabrication</strong>
+                  <p>All inputs originate from authentic portals (IMD, GSI, SOI, DDMP). Unlabeled locations are strictly preserved without synthetic negative labels or imputation.</p>
+                </div>
+              </div>
+              <div class="guardrail-item">
+                <div class="guardrail-num">02</div>
+                <div class="guardrail-body">
+                  <strong>40 Validated Village Universe</strong>
+                  <p>Modelling is strictly restricted to 40 validated LGD polygons with exact spatial containment (25 positive, 15 unlabeled). Unmatched areas are not interpolated.</p>
+                </div>
+              </div>
+              <div class="guardrail-item">
+                <div class="guardrail-num">03</div>
+                <div class="guardrail-body">
+                  <strong>Spatial Group Cross-Validation</strong>
+                  <p>Leave-One-Taluk-Out (LOTO) 6-fold spatial validation ensures zero spatial leakage across taluk boundaries (LOTO ROC-AUC 0.8747, PR-AUC 0.9426, Brier Score 0.1766).</p>
+                </div>
+              </div>
+              <div class="guardrail-item">
+                <div class="guardrail-num">04</div>
+                <div class="guardrail-body">
+                  <strong>Non-Destructive Scenario Engine</strong>
+                  <p>Rainfall scenarios evaluate in-memory feature perturbations while keeping raw data and SRTM terrain constant. Outputs are demonstration simulations, not live warnings.</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="guardrail-item">
-            <div class="guardrail-num">02</div>
-            <div class="guardrail-body">
-              <strong>40 Validated Village Universe</strong>
-              <p>Modelling is strictly restricted to 40 validated LGD polygons with exact spatial containment (25 positive, 15 unlabeled). Unmatched areas are not interpolated.</p>
-            </div>
-          </div>
-          <div class="guardrail-item">
-            <div class="guardrail-num">03</div>
-            <div class="guardrail-body">
-              <strong>Spatial Group Cross-Validation</strong>
-              <p>Leave-One-Taluk-Out (LOTO) 6-fold spatial validation ensures zero spatial leakage across taluk boundaries (LOTO ROC-AUC 0.8747, PR-AUC 0.9426).</p>
-            </div>
-          </div>
-          <div class="guardrail-item">
-            <div class="guardrail-num">04</div>
-            <div class="guardrail-body">
-              <strong>Non-Destructive Scenario Engine</strong>
-              <p>Rainfall scenarios evaluate in-memory feature perturbations while keeping raw data and SRTM terrain constant. Outputs are demonstration simulations, not live warnings.</p>
+            <div class="governance-footnote" id="model-reason">
+              PU-ML Active · 25 Positive · 15 Unlabeled · 6-Fold LOTO CV (ROC-AUC 0.8747) · UNLABELED ≠ NO RISK
             </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   </div>
 
-  <!-- Professional Footer -->
-  <footer class="app-footer">
-    <div class="footer-left">
-      <strong>FloodGuard</strong>
-      <span>Evidence-First Disaster Intelligence Framework</span>
-      <span class="sep">·</span>
-      <span>Nilgiris Pilot Demonstration</span>
-    </div>
-    <div class="footer-right">
-      <span class="badge-tag">NOT AN OFFICIAL WARNING BROADCAST</span>
-    </div>
-  </footer>
-
-  <!-- Scripts -->
+  <!-- External Libraries -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="/assets/js/dashboard.js"></script>
