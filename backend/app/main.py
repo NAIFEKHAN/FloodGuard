@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
 FRONTEND = ROOT / "frontend"
 
-app = FastAPI(title="FloodGuard Evidence Dashboard API", version="0.2.0")
+app = FastAPI(title="FloodGuard Evidence Dashboard API", version="0.3.0")
 app.mount("/assets", StaticFiles(directory=FRONTEND), name="assets")
 app.mount("/data", StaticFiles(directory=DATA), name="data")
 
@@ -45,6 +45,14 @@ def terrain() -> list[dict[str, str]]:
 @lru_cache(maxsize=1)
 def events() -> list[dict[str, str]]:
     return read_csv(DATA / "processed/landslide_events.csv")
+
+
+@lru_cache(maxsize=1)
+def experimental_hazard_index() -> list[dict[str, str]]:
+    rows = read_csv(DATA / "processed/experimental_hazard_index.csv")
+    if len(rows) != 40 or len({row["village_lgd_code"] for row in rows}) != 40:
+        raise RuntimeError("Experimental hazard-index artifact must contain exactly 40 unique validated villages.")
+    return rows
 
 
 @lru_cache(maxsize=1)
@@ -98,6 +106,18 @@ def get_events() -> dict[str, object]:
 @app.get("/api/ddmp")
 def get_ddmp() -> dict[str, object]:
     return {"classification": "OFFICIAL_DDMP_DOCUMENTARY_EVIDENCE_NOT_ML_LABELS", "manifest": ddmp_manifest(), "arg_stations": read_csv(DATA / "processed/disaster/ddmp_proposed_arg_stations.csv"), "aws_stations": read_csv(DATA / "processed/disaster/ddmp_aws_stations.csv"), "vulnerability_summary": read_csv(DATA / "processed/disaster/ddmp_vulnerable_location_summary.csv")}
+
+
+@app.get("/api/experimental-hazard-index")
+def get_experimental_hazard_index() -> dict[str, object]:
+    """Return the fixed Phase 8 descriptive index without recalculation or inference."""
+    rows = experimental_hazard_index()
+    return {
+        "classification": "EXPERIMENTAL_HAZARD_INDEX_NOT_ML_NOT_A_PREDICTION",
+        "record_count": len(rows),
+        "warning": "A relative, fixed-method demonstration index for 40 validated villages only; not a prediction, probability, warning, label, or calibrated risk score.",
+        "records": rows,
+    }
 
 
 @app.get("/api/status")
