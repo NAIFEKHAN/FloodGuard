@@ -1,0 +1,21 @@
+# API
+fastapi>=0.115,<1.0
+pydantic>=2.0,<3.0
+uvicorn[standard]>=0.30,<1.0
+
+# Data and GIS (used by later Phase 1 pipeline tasks)
+pandas>=2.0,<3.0
+numpy>=1.26,<3.0
+geopandas>=1.0,<2.0
+rasterio>=1.3,<2.0
+xarray>=2024.0,<2026.0
+pypdf>=5.0,<7.0
+openpyxl>=3.1,<4.0
+
+# ML (used in Phase 2; listed for planned project environment)
+scikit-learn>=1.4,<2.0
+xgboost>=2.0,<4.0
+
+# Tests
+pytest>=8.0,<9.0
+httpx>=0.27,<1.0

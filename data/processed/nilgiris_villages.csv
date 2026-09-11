@@ -1,0 +1,103 @@
+district_code,taluk_code,village_code,district_lgd_code,taluk_lgd_code,village_lgd_code,district_name_en,district_name_ta,taluk_name_en,taluk_name_ta,village_name_en,village_name_ta
+11,1,2,587,5756,635095,The Nilgiris,நீலகிரி,Udhagai,உதகை,Udhagai - Rural,உதகை ஊரகம்
+11,1,7,587,5756,635090,The Nilgiris,நீலகிரி,Udhagai,உதகை,Kookal,கூக்கல்
+11,1,8,587,5756,635092,The Nilgiris,நீலகிரி,Udhagai,உதகை,Thuneri,துானேரி
+11,1,9,587,5756,932021,The Nilgiris,நீலகிரி,Udhagai,உதகை,Sholur,சோலுார்
+11,1,10,587,5756,932015,The Nilgiris,நீலகிரி,Udhagai,உதகை,Naduvattam,நடுவட்டம்
+11,1,11,587,5756,635087,The Nilgiris,நீலகிரி,Udhagai,உதகை,Masinagudi,மசினகுடி
+11,1,12,587,5756,635093,The Nilgiris,நீலகிரி,Udhagai,உதகை,Hullathy,உல்லத்தி
+11,1,15,587,5756,932018,The Nilgiris,நீலகிரி,Udhagai,உதகை,Nanjanad2,நஞ்சநாடு 2
+11,1,16,587,5756,635091,The Nilgiris,நீலகிரி,Udhagai,உதகை,Kagguchi 1,கக்குச்சி 1
+11,1,17,587,5756,932013,The Nilgiris,நீலகிரி,Udhagai,உதகை,Kagguchi 2,கக்குச்சி 2
+11,1,18,587,5756,635089,The Nilgiris,நீலகிரி,Udhagai,உதகை,Ebbanad 1,எப்பநாடு 1
+11,1,19,587,5756,932008,The Nilgiris,நீலகிரி,Udhagai,உதகை,Ebbanad 2,எப்பநாடு 2
+11,1,20,587,5756,635096,The Nilgiris,நீலகிரி,Udhagai,உதகை,Thummanatty 1,தும்மனட்டி 1
+11,1,21,587,5756,932022,The Nilgiris,நீலகிரி,Udhagai,உதகை,Thummanatty 2,தும்மனட்டி 2
+11,1,22,587,5756,635088,The Nilgiris,நீலகிரி,Udhagai,உதகை,Kadanad 1,கடநாடு 1
+11,1,23,587,5756,932010,The Nilgiris,நீலகிரி,Udhagai,உதகை,Kadanad 2,கடநாடு 2
+11,1,33,587,5756,635094,The Nilgiris,நீலகிரி,Udhagai,உதகை,Nanjand1,நஞ்சநாடு 1
+11,2,1,587,5758,931911,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Ketti 1,கேத்தி 1
+11,2,3,587,5758,635113,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Coonoor Rural,குன்னுார் ஊரகம்
+11,2,4,587,5758,635111,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Yedapally,எடப்பள்ளி
+11,2,5,587,5758,635112,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Burliar,பர்லியார்
+11,2,6,587,5758,910517,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Hubathalai,உபதலை
+11,2,8,587,5758,635114,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Melur 1,மேலூர் 1
+11,2,9,587,5758,931891,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Adigaratty 1,அதிகரட்டி 1
+11,2,10,587,5758,931913,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Ketti 2,கேத்தி 2
+11,2,11,587,5758,931915,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Ketti 3,கேத்தி 3
+11,2,12,587,5758,931899,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Hulical 1,உலிக்கல் 1
+11,2,13,587,5758,931894,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Athigaratty 2,அதிகரட்டி 2
+11,2,14,587,5758,931900,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Hulical 2,உலிக்கல் 2
+11,2,15,587,5758,931919,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Melur 2,மேலூர் 2
+11,2,16,587,5758,931931,The Nilgiris,நீலகிரி,Coonoor,குன்னூர்,Melur 3,மேலூர் 3
+11,3,1,587,5757,635097,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Hallimoyar,அல்லிமாயார்
+11,3,2,587,5757,635098,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kallampalayam,கல்லம்பாளையம்
+11,3,3,587,5757,635099,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kodanad,கோடநாடு
+11,3,4,587,5757,635100,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Nedugula-I,நெடுகுளா - 1
+11,3,5,587,5757,635101,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Denad-I,தேனாடு - 1
+11,3,6,587,5757,635103,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Aracode,அரக்கொடு
+11,3,7,587,5757,635104,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kokodu,கோக்கொடு
+11,3,8,587,5757,635102,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Nandhipuram,நந்நிபுரம்
+11,3,9,587,5757,635105,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kadinamala,கடினமாலா
+11,3,10,587,5757,635106,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kengarai 1,கெங்கரை 1
+11,3,11,587,5757,635107,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Konavakorai-I,கொணவக்கரை - 1
+11,3,12,587,5757,635109,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kotagiri -1,கோத்தகிரி - 1
+11,3,13,587,5757,635108,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Naduhatty-1,நடுஹட்டி -1
+11,3,14,587,5757,931970,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kotagiri 2,கோத்தகிரி -2
+11,3,15,587,5757,635110,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Jackanarai,ஜக்கனாரை
+11,3,16,587,5757,931972,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kotagiri 3,கோத்தகிரி - 3
+11,3,17,587,5757,931944,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Jagathala-I,ஜகதளா - 1
+11,3,18,587,5757,931939,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Denad-Ii,தேனாடு - 2
+11,3,19,587,5757,931966,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Kenkarai-Ii,கெங்கரை - 2
+11,3,20,587,5757,931946,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Jagathala-Ii,ஜகதளா - 2
+11,3,21,587,5757,931967,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Konavakorai -2,கொணவக்கரை - 2
+11,3,22,587,5757,931975,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Nedugula-Ii,நெடுகுளா - 2
+11,3,23,587,5757,931974,The Nilgiris,நீலகிரி,Kotagiri,கோத்தகிர,Nadhuhatty-2,நடுஹட்டி -2
+11,4,1,587,5755,932079,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Cherumulli 1,செறுமுள்ளி 1
+11,4,2,587,5755,635086,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Sreemadurai,ஸ்ரீமதுரை
+11,4,3,587,5755,635085,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Mudumalai,முதுமலை
+11,4,4,587,5755,635084,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Nellakotta,நெலாகோட்டை
+11,4,5,587,5755,932081,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Devala 1,தேவாலா 1
+11,4,6,587,5755,932084,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur 1,கூடலூர் 1
+11,4,7,587,5755,932085,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Padanthorai 1,பாடந்தொரை 1
+11,4,9,587,5755,932087,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Cherumulli 2,செறுமுள்ளி 2
+11,4,10,587,5755,932090,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Padanthorai 2,பாடந்தொரை 2
+11,4,11,587,5755,932092,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur 2,கூடலூர் 2
+11,4,12,587,5755,932093,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Devala 2,தேவாலா 2
+11,4,13,587,5755,932095,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur - 2 Gr,கூடலூர் - 2 ஜி.ஆர்.
+11,4,14,587,5755,932097,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur 1- Ca,கூடலூர் 1 - சி.ஏ
+11,4,15,587,5755,932099,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur 2 - Ca,கூடலூர் 2 - சிஏ
+11,4,16,587,5755,932101,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Devala 1 - Ca,தேவாலா 1 - சி.ஏ
+11,4,17,587,5755,932102,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Devala 2 - Ca,தேவாலா 2 - சிஏ
+11,4,18,587,5755,932104,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Padanthorai 1 -Ca,பாடந்தொரை 1 - சி.ஏ
+11,4,19,587,5755,932105,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Padanthorai 2 - Ca,பாடந்தொரை 2 - சிஏ
+11,4,20,587,5755,932106,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Cherumulli 2 Ca,செறுமுள்ளி 2 சி.ஏ
+11,4,21,587,5755,932108,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Sreemadurai - Ca,ஸ்ரீமதுரை - சி.ஏ
+11,4,22,587,5755,932110,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Gudalur 1 - Gr,கூடலூர் 1 ஜிஆர்
+11,4,23,587,5755,932112,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Ovalley 1,ஒவேலி 1
+11,4,24,587,5755,932113,The Nilgiris,நீலகிரி,Gudalur,கூடலூர்,Ovalley 2,ஒவேலி 2
+11,5,1,587,5759,635117,The Nilgiris,நீலகிரி,Kundah,குந்தா,Ithalar 1,இத்தலார் 1
+11,5,2,587,5759,931986,The Nilgiris,நீலகிரி,Kundah,குந்தா,Bikkatty,பிக்கட்டி
+11,5,3,587,5759,635118,The Nilgiris,நீலகிரி,Kundah,குந்தா,Mulligoor,முள்ளிகூர்
+11,5,4,587,5759,635121,The Nilgiris,நீலகிரி,Kundah,குந்தா,Kinnakorai,கிண்ணக்கொரை
+11,5,5,587,5759,635120,The Nilgiris,நீலகிரி,Kundah,குந்தா,Mel-Kundah,மேல்குந்தா
+11,5,6,587,5759,931988,The Nilgiris,நீலகிரி,Kundah,குந்தா,Kil Kundah 1,கீழ்குந்தா 1
+11,5,7,587,5759,635119,The Nilgiris,நீலகிரி,Kundah,குந்தா,Balacola-1,பாலகொலா-1
+11,5,10,587,5759,931984,The Nilgiris,நீலகிரி,Kundah,குந்தா,Ithalar 2,இத்தலார் 2
+11,5,11,587,5759,931981,The Nilgiris,நீலகிரி,Kundah,குந்தா,Balacola 2,பாலகொலா 2
+11,5,12,587,5759,931991,The Nilgiris,நீலகிரி,Kundah,குந்தா,Kil-Kundah 2,கீழ்குந்தா-2
+11,6,1,587,5754,635081,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Moonnad 1,மூனனாடு 1
+11,6,2,587,5754,635082,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Nelliyalam 1,நெல்லியாளம் 1
+11,6,3,587,5754,635083,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Cherangode1,சேரங்கோடு - 1
+11,6,4,587,5754,635080,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Erumad 1,எருமாடு 1
+11,6,5,587,5754,932046,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Nelliyalam-2,நெல்லியாளம் - 2
+11,6,7,587,5754,932041,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Moonad-2,மூனனாடு - 2
+11,6,8,587,5754,932033,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Cherangode-2,சேரங்கோடு - 2
+11,6,11,587,5754,932037,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Erumad-2,எருமாடு - 2
+11,6,12,587,5754,932045,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Nelliyalam-1ca,நெல்லியாளம் - 1 - சீ ஏ
+11,6,14,587,5754,932131,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Nelliyalam-1janmam,நெல்லியாளம் - 1 - ஜென்மம்
+11,6,15,587,5754,932048,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Nelliyalam-2jenman,நெல்லியாளம் - 2 ஜென்மம்
+11,6,18,587,5754,932030,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Cherangode-1jenmam,சேரங்கோடு - 1 ஜென்மம்
+11,6,19,587,5754,932036,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Cherangode-2jenmam,சேரங்கோடு - 2 ஜென்மம்
+11,6,24,587,5754,932039,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Moonanad-1jenmam,மூனனாடு - 1 - ஜென்மம்
+11,6,25,587,5754,932044,The Nilgiris,நீலகிரி,Pandalur,பந்தலுார்,Moonanad-2jenmam,மூனனாடு - 2 ஜென்மம்

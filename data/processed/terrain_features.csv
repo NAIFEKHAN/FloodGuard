@@ -1,0 +1,3 @@
+settlement_id,settlement_name,latitude,longitude,region,district,elevation_m,slope_deg
+DEMO-NLG-001,Demo Nilgiris location A,11.41,76.69,Tamil Nadu,Nilgiris,2246.0,17.549813884833533
+DEMO-NLG-002,Demo Nilgiris location B,11.42,76.7,Tamil Nadu,Nilgiris,2378.0,8.882979920444779

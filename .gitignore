@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# FastAPI / local settings
+.env
+.env.*
+!.env.example
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# RAW DATA — keep locally, do not push
+data/raw/*
+!data/raw/.gitkeep
+
+# Keep small/project metadata under raw data
+!data/raw/admin/
+!data/raw/admin/.gitkeep
+!data/raw/disaster/
+!data/raw/disaster/.gitkeep
+!data/raw/rainfall/
+!data/raw/rainfall/.gitkeep
+!data/raw/dem/
+!data/raw/dem/.gitkeep
+!data/raw/settlements/
+!data/raw/settlements/.gitkeep
+
+# Large raw source files
+*.nc
+*.tif
+*.tiff
+*.hgt
+*.zip
+*.kmz
+
+# Processed data
+data/processed/*
+!data/processed/.gitkeep
+
+# Keep reproducible reports/documentation
+!data/processed/*.md
+!data/processed/*.json
+
+# Keep project CSV outputs
+!data/processed/*.csv
+
+# Demo data
+data/demo/*
+!data/demo/.gitkeep
+
+# ML artifacts
+model/artifacts/*
+!model/artifacts/.gitkeep

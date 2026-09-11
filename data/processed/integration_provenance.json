@@ -1,0 +1,47 @@
+{
+  "event_inventory_classification": "REAL_GSI_NLFC_SUPPLIED_INVENTORY",
+  "event_inventory_role": "Validated standalone inventory; not joined, geocoded, distance-matched, dated, or labelled",
+  "event_validation": {
+    "ambiguous_history": 30,
+    "duplicate_inventory_serials": 0,
+    "duplicate_slide_nos": 0,
+    "explicit_dates": 382,
+    "history_na": 355,
+    "incorrect_source_paths": 0,
+    "invalid_coordinates": 0,
+    "latitude_max": 11.55,
+    "latitude_min": 11.210556,
+    "longitude_max": 76.95066827,
+    "longitude_min": 76.24763889,
+    "missing_coordinates": 0,
+    "missing_district": 0,
+    "missing_source_pages": 0,
+    "missing_state": 0,
+    "outside_expected_range": 0,
+    "record_count": 772,
+    "year_only_history": 5
+  },
+  "inputs": {
+    "landslide_events": {
+      "path": "data/processed/landslide_events.csv",
+      "record_count": 772,
+      "sha256": "b3371db8fefdc5a37304d1ccc7f03bed064212c6e2ce930cdf70f3c2f8336dff"
+    },
+    "rainfall_features": {
+      "path": "data/processed/rainfall_features.csv",
+      "record_count": 732,
+      "sha256": "1ca1035cfa848f8ccdc66abb389ef40b109f110e475312d3f982bb5f0871f684"
+    },
+    "terrain_features": {
+      "path": "data/processed/terrain_features.csv",
+      "record_count": 2,
+      "sha256": "b427626fa269f21a908937c488ab3e533158889a6d98e792e0ad78256f838188"
+    }
+  },
+  "integration_phase": "Phase 1 derived-feature integration",
+  "output_record_count": 732,
+  "rainfall_source_classification": "REAL_DERIVED_FROM_IMD",
+  "settlement_daily_features_role": "DEMO settlement-day feature table; not a prediction or label table",
+  "settlement_input_classification": "DEMO",
+  "terrain_source_classification": "REAL_DERIVED_FROM_SRTM"
+}
